@@ -10,3 +10,5 @@ sqlc:
 	docker run --rm -v $(CURDIR):/src -w /src kjconroy/sqlc generate
 test:
 	go test -v -cover ./...
+server:
+	go run main.go
