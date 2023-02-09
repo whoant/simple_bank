@@ -1,0 +1,10 @@
+version: "3.8"
+services:
+  web:
+    build:
+      context: .
+      dockerfile: ./deployments/docker/local.Dockerfile
+    ports:
+      - "8080:3000"
+    volumes:
+      - ./:/app
