@@ -20,7 +20,7 @@ spec:
         - name: migrate-database
           image: migrate/migrate:latest
           command: ["/migrate"]
-          args: ["--path", "/db/migration", "-database", "$(DB_SOURCE)", "-verbose", "up"]
+          args: ["--path", "/migration", "-database", "$(DB_SOURCE)", "-verbose", "up"]
           envFrom:
             - secretRef:
                 name: secrets.simple-bank-api
