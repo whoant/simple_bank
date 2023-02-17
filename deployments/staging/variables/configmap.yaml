@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap.simple-bank-api
+  namespace: go-code
+data:
+  DB_DRIVER: postgres

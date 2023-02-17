@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simple-bank
+  namespace: go-code
+  labels:
+    app: simple-bank
+    tier: api
+spec:
+  selector:
+    matchLabels:
+      app: simple-bank
+  template:
+    metadata:
+      labels:
+        app: simple-bank
+        tier: api
+    spec:
+      initContainers:
+        - name: migrate-database
+          image: migrate/migrate:latest
+          command: ["/migrate"]
+          args: ["--path", "/db/migration", "-database", "$(DB_SOURCE)", "-verbose", "up"]
+          envFrom:
+            - secretRef:
+                name: secrets.simple-bank-api
+      containers:
+        - name: simple-bank-api
+          image: ghcr.io/whoant/simple-bank:VERSION
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "100m"
+            limits:
+              memory: "150Mi"
+              cpu: "150m"
+          envFrom:
+            - configMapRef:
+                name: configmap.simple-bank-api
+            - secretRef:
+                name: secrets.simple-bank-api
+      restartPolicy: Always
+
+
