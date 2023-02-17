@@ -1,10 +1,36 @@
-version: "3.8"
+version: "3.9"
 services:
-  web:
+  postgres:
+    image: postgres:15.1-alpine
+    environment:
+      - POSTGRES_PASSWORD=Vovanhoangtuan1
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=simple_bank
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "simple_bank", "-U", "postgres" ]
+      interval: 1s
+      timeout: 5s
+      retries: 5
+  migrate-database:
+    image: migrate/migrate
+    command: ["--path", "/migrations", "-database", "postgresql://postgres:Vovanhoangtuan1@postgres:5432/simple_bank?sslmode=disable", "-verbose", "up"]
+    volumes:
+      - $PWD/db/migration:/migrations
+    depends_on:
+      postgres:
+        condition: service_healthy
+  api:
     build:
       context: .
-      dockerfile: ./deployments/docker/local.Dockerfile
+      dockerfile: Dockerfile
     ports:
-      - "8080:3000"
-    volumes:
-      - ./:/app
+      - "8080:8080"
+    environment:
+      - DB_SOURCE=postgresql://postgres:Vovanhoangtuan1@postgres:5432/simple_bank?sslmode=disable
+    entrypoint: ["/app/start.sh"]
+    command: ["/app/main"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate-database:
+        condition: service_completed_successfully
