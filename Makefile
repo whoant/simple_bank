@@ -1,13 +1,18 @@
 DB_URL=postgresql://postgres:Vovanhoangtuan1@host.docker.internal:5433/simple_bank?sslmode=disable
+DB_URL_TEST=postgresql://postgres:Vovanhoangtuan1@localhost:5433/simple_bank?sslmode=disable
 
+migrate-up:
+	migrate -path db/migration -database "$(DB_URL_TEST)" -verbose up
+migrate-down:
+	migrate -path db/migration -database "$(DB_URL_TEST)" -verbose down
 migrate-up-docker:
 	docker run --rm -v $(CURDIR)/db/migration:/migrations migrate/migrate -path=/migrations/ -database "$(DB_URL)" -verbose up
 migrate-up-docker-1:
-	docker run --rm -v $(CURDIR)/db/migration:/migrations migrate/migrate -path=/migrations/ -database "postgresql://postgres:Vovanhoangtuan1@host.docker.internal:5433/simple_bank?sslmode=disable" -verbose up 1
+	docker run --rm -v $(CURDIR)/db/migration:/migrations migrate/migrate -path=/migrations/ -database "$(DB_URL)" -verbose up 1
 migrate-down-docker:
-	docker run --rm -v $(CURDIR)/db/migration:/migrations migrate/migrate -path=/migrations/ -database "postgresql://postgres:Vovanhoangtuan1@host.docker.internal:5433/simple_bank?sslmode=disable" -verbose down -all
+	docker run --rm -v $(CURDIR)/db/migration:/migrations migrate/migrate -path=/migrations/ -database "$(DB_URL)" -verbose down -all
 migrate-down-docker-1:
-	docker run --rm -v $(CURDIR)/db/migration:/migrations migrate/migrate -path=/migrations/ -database "postgresql://postgres:Vovanhoangtuan1@host.docker.internal:5433/simple_bank?sslmode=disable" -verbose down 1
+	docker run --rm -v $(CURDIR)/db/migration:/migrations migrate/migrate -path=/migrations/ -database "$(DB_URL)" -verbose down 1
 migrate-create:
 	docker run --rm -v $PWD/db/migration:/migrations migrate/migrate -path=/migrations/ create -ext sql -dir migrations -seq add_users
 sqlc:
