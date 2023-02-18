@@ -21,7 +21,7 @@ spec:
         - name: migrate-database
           image: migrate/migrate:latest
           command: ["/migrate"]
-          args: ["--source", "github://whoant/simple-bank/db/migration", "-database", "$(DB_SOURCE)", "-verbose", "up"]
+          args: ["--source", "github://whoant/simple-bank/db/migration#d978c97fdcd3c805819eabe89ac18dff56ac5c1b", "-database", "$(DB_SOURCE)", "-verbose", "up"]
           envFrom:
             - secretRef:
                 name: secrets.simple-bank-api
