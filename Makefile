@@ -11,7 +11,7 @@ migrate-down-docker:
 migrate-down-docker-1:
 	docker run --rm -v $(CURDIR)/db/migration:/migrations migrate/migrate -path=/migrations/ -database "postgresql://postgres:Vovanhoangtuan1@host.docker.internal:5433/simple_bank?sslmode=disable" -verbose down 1
 migrate-create:
-	docker run --rm -v $(CURDIR)/db/migration:/migrations migrate/migrate -path=/migrations/ create -ext sql -dir migrations -seq add_users
+	docker run --rm -v $PWD/db/migration:/migrations migrate/migrate -path=/migrations/ create -ext sql -dir migrations -seq add_users
 sqlc:
 	docker run --rm -v $(CURDIR):/src -w /src kjconroy/sqlc generate
 test:
