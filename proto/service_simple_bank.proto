@@ -1,5 +1,5 @@
 syntax = "proto3";
-import "rpc_crate_user.proto";
+import "rpc_create_user.proto";
 import "rpc_login_user.proto";
 
 package pb;
