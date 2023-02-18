@@ -3,6 +3,8 @@ kind: Ingress
 metadata:
   name: ingress.simple-bank
   namespace: go-code
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
 spec:
   ingressClassName: nginx
   rules:
@@ -14,5 +16,15 @@ spec:
                 name: simple-bank
                 port:
                   number: 8081
+            pathType: Prefix
+            path: /
+    - host: grpc.vovanhoangtuan.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: simple-bank
+                port:
+                  number: 9091
             pathType: Prefix
             path: /

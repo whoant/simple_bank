@@ -33,12 +33,12 @@ spec:
             - containerPort: 8080
             - containerPort: 9090
           resources:
-            requests:
-              memory: "100Mi"
-              cpu: "100m"
             limits:
-              memory: "150Mi"
-              cpu: "150m"
+              cpu: 100m
+              memory: 100Mi
+            requests:
+              cpu: 50m
+              memory: 50Mi
           envFrom:
             - configMapRef:
                 name: configmap.simple-bank-api

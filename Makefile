@@ -38,3 +38,5 @@ protoc:
         proto/*.proto
 evnas:
 	evans --host localhost --port 9090 -r repl
+evans-prod:
+	evans --host grpc.vovanhoangtuan.com --port 443 -r repl
