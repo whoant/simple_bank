@@ -1,9 +1,7 @@
-migrate-up:
-	migrate -path db/migration -database "postgresql://postgres:Vovanhoangtuan1@localhost:5433/simple_bank?sslmode=disable" -verbose up
-migrate-down:
-	migrate -path db/migration -database "postgresql://postgres:Vovanhoangtuan1@localhost:5433/simple_bank?sslmode=disable" -verbose down
+DB_URL=postgresql://postgres:Vovanhoangtuan1@host.docker.internal:5433/simple_bank?sslmode=disable
+
 migrate-up-docker:
-	docker run --rm -v $(CURDIR)/db/migration:/migrations migrate/migrate -path=/migrations/ -database "postgresql://postgres:Vovanhoangtuan1@host.docker.internal:5433/simple_bank?sslmode=disable" -verbose up
+	docker run --rm -v $(CURDIR)/db/migration:/migrations migrate/migrate -path=/migrations/ -database "$(DB_URL)" -verbose up
 migrate-up-docker-1:
 	docker run --rm -v $(CURDIR)/db/migration:/migrations migrate/migrate -path=/migrations/ -database "postgresql://postgres:Vovanhoangtuan1@host.docker.internal:5433/simple_bank?sslmode=disable" -verbose up 1
 migrate-down-docker:
@@ -24,4 +22,9 @@ docker-build:
 	docker rmi simple-bank:latest && docker build -t simple-bank:latest .
 docker-run:
 	docker run --rm --name simple-bank --network=bank-network -p 8080:8080 -e GIN_MODE=release -e DB_SOURCE=postgresql://postgres:Vovanhoangtuan1@postgres:5432/simple_bank?sslmode=disable  simple-bank:latest
+db_docs:
+	dbdocs build doc/db.dbml
+db_schema:
+	dbml2sql --postgres -o doc/schema.sql doc/db.dbml
+
 
