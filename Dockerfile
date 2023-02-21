@@ -12,6 +12,7 @@ COPY start.sh .
 COPY app.env .
 
 EXPOSE 8080
+EXPOSE 9090
 
 CMD ["/app/main"]
 ENTRYPOINT ["/app/start.sh"]
