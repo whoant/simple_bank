@@ -6,3 +6,4 @@ tmp
 docker-compose.yaml
 Makefile
 .air.toml
+doc/swagger
