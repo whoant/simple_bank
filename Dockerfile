@@ -10,6 +10,7 @@ WORKDIR /app
 COPY --from=builder app/main .
 COPY start.sh .
 COPY app.env .
+COPY db/migration ./db/migration
 
 EXPOSE 8080
 EXPOSE 9090
