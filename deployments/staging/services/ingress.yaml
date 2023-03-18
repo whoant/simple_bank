@@ -15,7 +15,7 @@ spec:
               service:
                 name: simple-bank
                 port:
-                  number: 8081
+                  name: http
             pathType: Prefix
             path: /
     - host: grpc-sb.vovanhoangtuan.com
