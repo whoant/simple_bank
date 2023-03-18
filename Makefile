@@ -16,7 +16,7 @@ migrate-down-docker-1:
 migrate-create:
 	docker run --rm -v $PWD/db/migration:/migrations migrate/migrate -path=/migrations/ create -ext sql -dir migrations -seq add_users
 sqlc:
-	docker run --rm -v $(CURDIR):/src -w /src kjconroy/sqlc generate
+	sqlc generate
 test:
 	go test -v -cover ./...
 mock:

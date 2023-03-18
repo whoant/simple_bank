@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress.simple-bank-swagger
+  namespace: go-code
+
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: doc-sb.vovanhoangtuan.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: simple-bank
+                port:
+                  name: http
+            pathType: Prefix
+            path: /
