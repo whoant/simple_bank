@@ -7,8 +7,11 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/hibiken/asynq"
+	"github.com/hibiken/asynqmon"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/whoant/simple_bank/worker"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -46,9 +49,16 @@ func main() {
 	// run db migrate
 	runDBMigration(config.MigrationURL, config.DBSource)
 	store := db.NewStore(conn)
+
+	redisOpt := asynq.RedisClientOpt{
+		Addr: config.RedisAddress,
+	}
+
+	taskDistributor := worker.NewRedisTaskDistributor(redisOpt)
+	runTaskProcessor(redisOpt, store)
 	//go runGinServer(config, store)
-	go runGatewayServer(config, store)
-	runGrpcServer(config, store)
+	go runGatewayServer(config, store, taskDistributor)
+	runGrpcServer(config, store, taskDistributor)
 }
 
 func runDBMigration(migrationURL string, dbSource string) {
@@ -63,8 +73,17 @@ func runDBMigration(migrationURL string, dbSource string) {
 	log.Info().Msg("db migrate successfully")
 }
 
-func runGrpcServer(config utils.Config, store db.Store) {
-	server, err := gapi.NewServer(config, store)
+func runTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store) {
+	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store)
+	log.Info().Msg("start task processor")
+	err := taskProcessor.Start()
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to start task processor")
+	}
+}
+
+func runGrpcServer(config utils.Config, store db.Store, taskDistributor worker.TaskDistributor) {
+	server, err := gapi.NewServer(config, store, taskDistributor)
 	if err != nil {
 		log.Fatal().Msgf("cannot create server:", err)
 	}
@@ -98,8 +117,8 @@ func runGinServer(config utils.Config, store db.Store) {
 	}
 }
 
-func runGatewayServer(config utils.Config, store db.Store) {
-	server, err := gapi.NewServer(config, store)
+func runGatewayServer(config utils.Config, store db.Store, taskDistributor worker.TaskDistributor) {
+	server, err := gapi.NewServer(config, store, taskDistributor)
 	if err != nil {
 		log.Fatal().Msgf("cannot create server:", err)
 	}
@@ -131,6 +150,14 @@ func runGatewayServer(config utils.Config, store db.Store) {
 
 	swaggerHandler := http.StripPrefix("/swagger/", http.FileServer(statikFS))
 	mux.Handle("/swagger/", swaggerHandler)
+
+	mon := asynqmon.New(asynqmon.Options{
+		RootPath: "/monitoring/tasks/",
+		RedisConnOpt: asynq.RedisClientOpt{
+			Addr: config.RedisAddress,
+		},
+	})
+	mux.Handle("/monitoring/tasks/", mon)
 
 	//fs := http.FileServer(http.Dir("./doc/swagger"))
 	//mux.Handle("/swagger/", http.StripPrefix("/swagger/", fs))
