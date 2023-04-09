@@ -112,6 +112,7 @@ func runGatewayServer(config utils.Config, store db.Store) {
 			DiscardUnknown: true,
 		},
 	})
+
 	grpcMux := runtime.NewServeMux(jsonOption)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -140,7 +141,9 @@ func runGatewayServer(config utils.Config, store db.Store) {
 	}
 
 	log.Info().Msgf("start HTTP gateway server at %s", listener.Addr().String())
-	err = http.Serve(listener, mux)
+	handler := gapi.HttpLogger(mux)
+
+	err = http.Serve(listener, handler)
 	if err != nil {
 		log.Fatal().Msgf("cannot start HTTP gateway server")
 	}
